@@ -34,7 +34,7 @@ public class Handler implements Runnable {
         try {
             while (true) {
                 String message = dis.readUTF();
-                server.broadCastMessage(getMessage(message));
+
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,6 +7,10 @@ import java.net.URISyntaxException;
 public class IoUtils {
     public static void main(String... args) throws IOException {
         String c = "copy1.txt";
+        File root = new File("C:/Education/Java4/Java4Server/Java4Server/root");
+        if(!root.exists()){
+            root.mkdir();
+              }
         //String resurses = IoUtils.class.getResource("1.txt").getFile();
         InputStream in = new FileInputStream("C:/Education/Java4/Java4Server/Java4Server/src/main/resources/comResurses/dir1/1.txt");
 
