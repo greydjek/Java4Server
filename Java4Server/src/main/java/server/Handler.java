@@ -2,6 +2,7 @@ package server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -13,6 +14,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Handler implements Runnable {
+   private static final int BUFFER_SIZE = 1024;
+    private byte [] buffer;
     private Path root;
     private Path userDir;
     private String userName;
@@ -24,6 +27,7 @@ public class Handler implements Runnable {
     private SimpleDateFormat format;
 
     public Handler(Socket socket, Server server) throws IOException {
+
         root = Paths.get("C:\\Education\\Java4\\Java4Server\\Java4Server\\Server");
         if (!Files.exists(root)) {
             Files.createDirectory(root);
@@ -49,7 +53,12 @@ public class Handler implements Runnable {
                 String fileName = dis.readUTF();
                 long size = dis.readLong();
    Path path = userDir.resolve(fileName);
-    Files.copy(dis, path, StandardCopyOption.REPLACE_EXISTING);
+try(FileOutputStream fos = new FileOutputStream(path.toFile())){
+    for (int i = 0; i < (size + BUFFER_SIZE-1)/BUFFER_SIZE; i++) {
+        int reed = dis.read(buffer);
+    fos.write(buffer,0,reed);
+    }
+}
     responseOk();
             }
         } catch (IOException e) {
@@ -64,7 +73,7 @@ public class Handler implements Runnable {
     }
 
     public String getMessage(String message) {
-        return getTime() + "[" + userName + "]" + message;
+        return message;
     }
 
     private void responseOk() throws IOException {
