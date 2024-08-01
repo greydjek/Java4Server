@@ -67,6 +67,9 @@ public class NioServer {
                 switch (sb.toString()) {
                     case "ls":
                         handleCommand();
+                        byteBuffer.clear();
+                        String s= (String) Files.list(DIRECTORY).collect(Collectors.toList()).toArray().toString();
+                        channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)) );
 
                         break;
                     case "cat":
