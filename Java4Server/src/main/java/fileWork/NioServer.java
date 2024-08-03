@@ -72,64 +72,59 @@ public class NioServer {
                 command = sb.toString().split(" ");
             }
         }
-       byteBuffer.clear();
+        byteBuffer.clear();
         switch (command[0]) {
             case "ls":
-            listreturn();
-            for (String l : listFiles) {
-                System.out.println(l +" ");
+                listreturn();
+                for (String l : listFiles) {
+                    System.out.println(l + " ");
                     String s = "[" + l + "] ";
                     channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
-            }
-            byteBuffer.clear();
-            break;
+                }
+                byteBuffer.clear();
+                break;
             case "cat":
-            String nameF = "";
-            String pathFile;
-            byteBuffer.clear();
-            listreturn();
-            File f;
-            System.out.println(command.length);
-            for (int i = 0; i < command.length; i++) {
-                System.out.println(command[i]);
-            }
+                String nameF = "";
+                String pathFile;
+                byteBuffer.clear();
+                listreturn();
+                File f;
+                System.out.println(command.length);
+                for (int i = 0; i < command.length; i++) {
+                    System.out.println(command[i]);
+                }
                 if (sb.toString().contains(" ")) {
+                    System.out.println("open file " + command[1]);
                     for (String name : listFiles) {
-                        if (command[1].equals(name)){
+                        if (command[1].equals(name)) {
                             System.out.println(name);
-                            nameF= name;
+                            nameF = name;
                         }
                     }
-                if (command[1].equals(nameF)) {
-                    System.out.println("open file " + command[1]);
-                    pathFile = String.valueOf(DIRECTORY.resolve(nameF));
-                    f = new File(pathFile);
-                    try (InputStream fis = new FileInputStream(f)) {
-                        byte[] bytes = new byte[(int) f.length()];
+                    if (nameF.equals(command[1])) {
+                        pathFile = String.valueOf(DIRECTORY.resolve(nameF));
+                        f = new File(pathFile);
+                        try (InputStream fis = new FileInputStream(f)) {
+                            byte[] bytes = new byte[(int) f.length()];
                             fis.read(bytes);
                             String file = new String(bytes, StandardCharsets.UTF_8);
                             channel.write(ByteBuffer.wrap(file.getBytes(StandardCharsets.UTF_8)));
                             System.out.println(file);
                         }
+                    } else {
+                        String s = "File not found";
+                        channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
+                    }
                 } else {
-                    String s = "File not found";
+                    String s = "not found command";
                     channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
                 }
-
-
-            } else {
-                String s = "not found command";
-                    channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
-            }
-            break;
-            default:      String resault = "[From server] " + sb.toString();
+                break;
+            default:
+                String resault = "[From server] " + sb.toString();
                 channel.write(ByteBuffer.wrap(resault.getBytes(StandardCharsets.UTF_8)));
-            break;
+                break;
         }
-
-
-
-
     }
 
     private void handleAccept(SelectionKey key) throws IOException {
