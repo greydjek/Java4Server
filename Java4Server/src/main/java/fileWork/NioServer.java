@@ -1,7 +1,12 @@
 package fileWork;
 
+import com.sun.source.tree.WhileLoopTree;
+
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -14,14 +19,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NioServer {
     private ByteBuffer byteBuffer = ByteBuffer.allocate(256);
-    private String command;
     private final Path DIRECTORY = Path.of("C:\\Education\\Java4\\Java4Server\\Java4Server\\Server");
-    private ArrayList<String> listFiles;
+    private List<String> listFiles;
+    String[] command;
     Selector selector;
     ServerSocketChannel serverSocketChannel;
 
@@ -63,23 +69,64 @@ public class NioServer {
             byteBuffer.flip();
             while (byteBuffer.hasRemaining()) {
                 sb.append((char) byteBuffer.get());
-                command = byteBuffer.toString();
-                switch (sb.toString()) {
-                    case "ls":
-                        handleCommand();
-                        byteBuffer.clear();
-                        String s= (String) Files.list(DIRECTORY).collect(Collectors.toList()).toArray().toString();
-                        channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)) );
-
-                        break;
-                    case "cat":
-                        break;
-                          }
+                command = sb.toString().split(" ");
+            }
+        }
+       byteBuffer.clear();
+        switch (command[0]) {
+            case "ls":
+            byteBuffer.clear();
+            listreturn();
+            for (String l : listFiles) {
+                System.out.println(l +" ");
+                    String s = "[" + l + "] ";
+                    channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
             }
             byteBuffer.clear();
+            break;
+            case "cat":
+            String nameF;
+            String pathFile;
+            byteBuffer.clear();
+            listreturn();
+            File f;
+            System.out.println(command.length);
+            for (int i = 0; i < command.length; i++) {
+                System.out.println(command[i]);
+            }
+            if (sb.toString().contains(" ")) {
+                for (String name : listFiles) {
+                        System.out.println(name);
+                        if (command[1].equals(name)) {
+                            System.out.println("open file " + command[1]);
+                            pathFile = String.valueOf(DIRECTORY.resolve(name));
+                            f = new File(pathFile);
+                            try (InputStream fis = new FileInputStream(f)) {
+                                byte[] bytes = new byte[(int) f.length()];
+                                fis.read(bytes);
+                                String file = new String(bytes, StandardCharsets.UTF_8);
+                                channel.write(ByteBuffer.wrap(file.getBytes(StandardCharsets.UTF_8)));
+                                System.out.println(file);
+                            }
+                        } else {
+                            String s = "File not found";
+                            channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
+                        }
+                    }
+
+
+            } else {
+                String s = "not found command";
+                    channel.write(ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8)));
+            }
+            break;
+            default:
+            break;
         }
-        String resault = "[From server] " + sb.toString();
-        channel.write(ByteBuffer.wrap(resault.getBytes(StandardCharsets.UTF_8)));
+
+            String resault = "[From server] " + sb.toString();
+            channel.write(ByteBuffer.wrap(resault.getBytes(StandardCharsets.UTF_8)));
+
 
     }
 
@@ -90,15 +137,20 @@ public class NioServer {
         channel.register(selector, SelectionKey.OP_READ);
     }
 
-    private void handleCommand() throws IOException {
-        //if (message.equals("ls")){
-        listFiles = (ArrayList<String>) Files.list(DIRECTORY).map(path -> path.getFileName().toString())
-                .collect(Collectors.toList());
-        for (int i = 0; i < listFiles.size(); i++) {
-            byteBuffer.put(listFiles.get(i).getBytes());
-            //  }
-        }
+    private List listreturn() throws IOException {
+        return listFiles = Files.list(DIRECTORY).map(p -> p.getFileName().
+                toString()).collect(Collectors.toList());
     }
+
+//    private void handleCommand() throws IOException {
+//        //if (message.equals("ls")){
+//        listFiles = (ArrayList<String>) Files.list(DIRECTORY).map(path -> path.getFileName().toString())
+//                .collect(Collectors.toList());
+//        for (int i = 0; i < listFiles.size(); i++) {
+//             byteBuffer.put(listFiles.get(i).getBytes());
+//             //  }
+//        }
+//    }
 
     public static void main(String... args) throws IOException {
         new NioServer();
