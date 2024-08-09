@@ -21,7 +21,11 @@ public class Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                         protected void initChannel(SocketChannel channel) throws Exception{
-
+ channel.pipeline().addLast(
+         new MessageDecoder(),
+         new MessageEncoder(),
+         new StringHandler()
+ );
                     }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(8189).sync();

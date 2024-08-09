@@ -10,14 +10,14 @@ public class MessageDecoder extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-log.debug("Client connect");
+log.debug("Client connect...");
 
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf= (ByteBuf) msg;
-        log.debug("{}", byteBuf);
+        log.debug("{}", msg);
     StringBuilder sb = new StringBuilder();
     while (byteBuf.isReadable()){
         char c = (char) byteBuf.readByte();

@@ -12,7 +12,7 @@ public class StringHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(StringHandler.class);
 private SimpleDateFormat format;
 
-    public StringHandler(SimpleDateFormat format) {
+    public StringHandler() {
         format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     }
 
@@ -20,7 +20,7 @@ private SimpleDateFormat format;
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 String str = (String) msg;
 log.debug("received: {}", msg );
-String resalt = "["+ format.format(new Date() ) + "]" + str;
+String resalt = "["+ format.format(new Date()) + "]" + str;
 ctx.write(resalt);
     }
 }
