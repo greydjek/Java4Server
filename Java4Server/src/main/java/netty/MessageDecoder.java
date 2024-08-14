@@ -4,13 +4,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class MessageDecoder extends ChannelInboundHandlerAdapter {
 
+    private static final Logger log = LoggerFactory.getLogger(MessageDecoder.class);
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-log.debug("Client connect...");
+        log.debug("Client connect...");
+        System.out.println("Client connect...");
 
     }
 
