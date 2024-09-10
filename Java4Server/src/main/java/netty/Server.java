@@ -7,10 +7,17 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class Server {
+    private static final Logger log = LoggerFactory.getLogger(Server.class);
+
     public Server(){
         EventLoopGroup auth = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
@@ -22,8 +29,11 @@ public class Server {
                     @Override
                         protected void initChannel(SocketChannel channel) throws Exception{
  channel.pipeline().addLast(
-         new MessageDecoder(),
          new MessageEncoder(),
+         new MessageDecoder(),
+         new ObjectEncoder(),
+         new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+         new MessageHandler(),
          new StringHandler()
  );
                     }
