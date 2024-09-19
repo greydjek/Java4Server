@@ -33,7 +33,7 @@ public class Server {
          new MessageDecoder(),
          new ObjectEncoder(),
          new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-         new MessageHandler(),
+         //new MessageHandler(),
          new StringHandler()
  );
                     }
