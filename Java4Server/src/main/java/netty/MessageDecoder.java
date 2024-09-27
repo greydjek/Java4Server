@@ -20,8 +20,8 @@ log.debug("Client connect...");
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf byteBuf= (ByteBuf) msg;
-        log.debug("{}", msg);
+        ByteBuf byteBuf = (ByteBuf) msg;
+        log.debug("{}", msg.toString());
     StringBuilder sb = new StringBuilder();
     while (byteBuf.isReadable()){
         char c = (char) byteBuf.readByte();

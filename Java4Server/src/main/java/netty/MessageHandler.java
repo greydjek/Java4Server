@@ -1,6 +1,8 @@
 package netty;
 
 import lombok.Builder;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import messageWorker.AbstractMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -10,16 +12,15 @@ import messageWorker.ListMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.channels.ScatteringByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Builder
 public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage> {
     private static final Logger log = LoggerFactory.getLogger(MessageHandler.class);
     private Path serverDir;
@@ -28,9 +29,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 //содать папку при регистрации пользователя
-        serverDir = Paths.get("Server");
-        ctx.writeAndFlush(new ListMessage(serverDir));
         byffer = new byte[8192];
+        serverDir = Paths.get("C:\\Education\\Java4\\Java4Server\\Java4Server\\Server");
+        ctx.writeAndFlush(new ListMessage(serverDir));
+        log.debug("client connect...");
     }
 
     @Override
@@ -42,32 +44,39 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
             case FILE_REQUEST:
                 sendFile((FileRequest) msg, ctx);
                 break;
+            case AUTENTIFCATION_MESSAGE:
+                autentificatioUser(msg, ctx);
         }
     }
 
+    private void autentificatioUser(AbstractMessage msg, ChannelHandlerContext ctx) {
+    List<String> userNamePass =  Arrays.stream(msg.toString().split("@")).collect(Collectors.toList());
+
+    }
+
     private void sendFile(FileRequest msg, ChannelHandlerContext ctx) throws IOException {
-        boolean isFirstBatch = true;
+        boolean isFirstBatch = true, isFinishBatch;
         Path filePash = serverDir.resolve(msg.getName());
         long size = Files.size(filePash);
         try (FileInputStream is = new FileInputStream(serverDir.resolve(msg.getName()).toFile())) {
             int read;
             while ((read = is.read(byffer)) != -1) {
-                FileMessage message = FileMessage.builder()
-                                .bytes(byffer)
-                                .size(size)
-                                .isFirstButch(isFirstBatch)
-                                .isFinishBatch(is.available() <= 0)
-                                .endByteNum(read)
-                                .build();
-                isFirstBatch = false;
+                isFinishBatch = (is.available() <= 0);
+FileMessage message = new FileMessage(filePash, byffer, msg.getName().toString(), isFirstBatch, isFinishBatch,read);
+              isFirstBatch = false;
                 ctx.writeAndFlush(message);
             }
         } catch (Exception e) {
         }
     }
 
-    private void processFile(FileMessage msg, ChannelHandlerContext ctx) {
+    private void processFile(FileMessage msg, ChannelHandlerContext ctx) throws IOException {
         Path file = serverDir.resolve(msg.getName());
-
+if (msg.isFirstButch()){
+    Files.deleteIfExists(file);
+}
+try (FileOutputStream fos = new FileOutputStream(file.toFile(), true)){
+    fos.write(msg.getBytes(),0, msg.getEndByteNum());
+}
     }
 }

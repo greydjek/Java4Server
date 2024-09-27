@@ -18,37 +18,38 @@ import org.slf4j.LoggerFactory;
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
 
-    public Server(){
+    public Server() {
         EventLoopGroup auth = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
-        try{
+        try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(auth,worker)
+            serverBootstrap.group(auth, worker)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                        protected void initChannel(SocketChannel channel) throws Exception{
- channel.pipeline().addLast(
-         new MessageEncoder(),
-         new MessageDecoder(),
-         new ObjectEncoder(),
-         new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-         //new MessageHandler(),
-         new StringHandler()
- );
-                    }
+                        @Override
+                        protected void initChannel(SocketChannel channel) throws Exception {
+                            channel.pipeline().addLast(
+                                    new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+                                    new MessageHandler(),
+                            new ObjectEncoder()
+//       new MessageEncoder(),
+//         new MessageDecoder(),
+//         new StringHandler()
+                            );
+                        }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(8189).sync();
             log.debug("Server started...");
-channelFuture.channel().closeFuture().sync();// block
-        }catch (Exception e){
+            channelFuture.channel().closeFuture().sync();// block
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-auth.shutdownGracefully();
-worker.shutdownGracefully();
+        } finally {
+            auth.shutdownGracefully();
+            worker.shutdownGracefully();
         }
     }
-    public static void main (String... args){
+
+    public static void main(String... args) {
         new Server();
     }
 }
