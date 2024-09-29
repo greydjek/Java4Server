@@ -30,8 +30,8 @@ public class Server {
                         protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast(
                                     new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                    new MessageHandler(),
-                            new ObjectEncoder()
+                                    new ObjectEncoder(),
+                                    new MessageHandler()
 //       new MessageEncoder(),
 //         new MessageDecoder(),
 //         new StringHandler()
