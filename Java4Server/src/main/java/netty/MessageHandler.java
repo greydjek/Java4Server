@@ -46,6 +46,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
                 break;
             case AUTENTIFCATION_MESSAGE:
                 autentificatioUser(msg, ctx);
+                break;
+            case LIST_MESSAGE:
+                ctx.writeAndFlush(new ListMessage(serverDir));
+                break;
         }
     }
 
