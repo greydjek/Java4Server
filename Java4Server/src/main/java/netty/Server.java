@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
 
@@ -29,13 +28,11 @@ public class Server {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast(
-                                    new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                    new ObjectEncoder(),
-                                    new MessageHandler()
-//       new MessageEncoder(),
-//         new MessageDecoder(),
-//         new StringHandler()
+                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+                            new ObjectEncoder(),
+                            new MessageHandler()
                             );
+                            log.info("message send");
                         }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(8189).sync();
