@@ -13,6 +13,7 @@ public class Server {
     public Server() throws IOException {
         client = new ConcurrentLinkedDeque<>();
         try {
+
             serverSocket = new ServerSocket(PORT);
             System.out.println("Server start... ");
             while (true) {
@@ -24,12 +25,6 @@ public class Server {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public void broadCastMessage(String message) throws IOException {
-        for (Handler c : client) {
-            c.sendMessage(message);
         }
     }
 
