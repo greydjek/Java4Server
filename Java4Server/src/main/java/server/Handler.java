@@ -28,7 +28,7 @@ public class Handler implements Runnable {
 
     public Handler(Socket socket, Server server) throws IOException {
 
-        root = Paths.get("C:\\Education\\Java4\\Java4Server\\Java4Server\\Server");
+        root = Paths.get("C:\\Projects\\repositoryClientServerNetty\\Java4Server\\Java4Server\\server");
         if (!Files.exists(root)) {
             Files.createDirectory(root);
         }

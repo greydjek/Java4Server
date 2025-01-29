@@ -30,7 +30,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractMessage>
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 //содать папку при регистрации пользователя
         byffer = new byte[8192];
-        serverDir = Paths.get("C:\\Education\\Java4\\Java4Server\\Java4Server\\Server");
+        serverDir = Paths.get("C:\\Projects\\repositoryClientServerNetty\\Java4Server\\Java4Server\\server");
         ctx.writeAndFlush(new ListMessage(serverDir));
         log.debug("client connect...");
     }
